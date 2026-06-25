@@ -1,0 +1,10 @@
+{
+  "name": "Tokio-printer-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local helper that forwards ESC/POS bytes from the Tokio POS frontend to a CUPS raw printer queue",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
