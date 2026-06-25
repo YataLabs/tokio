@@ -49,9 +49,14 @@ app.include_router(transactions.router)
 app.include_router(reports.router)
 app.include_router(sync.router)
 
-UPLOADS_DIR = os.path.join(os.path.dirname(__file__), "..", "uploads")
+# On Vercel (serverless) only /tmp is writable; fall back gracefully
+_local_uploads = os.path.join(os.path.dirname(__file__), "..", "uploads")
+UPLOADS_DIR = "/tmp/uploads" if os.environ.get("VERCEL") else _local_uploads
 os.makedirs(UPLOADS_DIR, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
+try:
+    app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
+except Exception:
+    pass  # directory may be empty on first cold start
 
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 

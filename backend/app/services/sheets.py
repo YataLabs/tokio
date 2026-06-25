@@ -56,10 +56,17 @@ def _client(spreadsheet_id: str | None = None):
     if not sid:
         raise RuntimeError("SHEETS_SPREADSHEET_ID not set in .env")
 
-    # ── Option A: service account key ────────────────────────────
-    if SA_KEY.exists():
+    # ── Option A: service account key (file or base64 env var) ──────
+    sa_json_b64 = os.environ.get("SHEETS_SA_JSON_BASE64")
+    if sa_json_b64 or SA_KEY.exists():
+        import json as _json
+        import base64 as _b64
         from google.oauth2.service_account import Credentials
-        creds = Credentials.from_service_account_file(str(SA_KEY), scopes=SCOPES)
+        if sa_json_b64:
+            info = _json.loads(_b64.b64decode(sa_json_b64))
+        else:
+            info = _json.loads(SA_KEY.read_text())
+        creds = Credentials.from_service_account_info(info, scopes=SCOPES)
         gc = gspread.authorize(creds)
         return gc, gc.open_by_key(sid)
 
