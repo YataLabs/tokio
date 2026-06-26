@@ -1,10 +1,24 @@
 {
-  "name": "Tokio-printer-bridge",
+  "name": "tokio-printer-bridge",
   "version": "1.0.0",
-  "private": true,
-  "description": "Local helper that forwards ESC/POS bytes from the Tokio POS frontend to a CUPS raw printer queue",
+  "description": "Local print bridge for Tokio POS — forwards ESC/POS to a CUPS printer",
   "main": "server.js",
+  "bin": {
+    "tokio-bridge": "server.js"
+  },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build:mac": "pkg server.js --target node18-macos-arm64 --output dist/tokio-bridge-mac",
+    "build:mac-x64": "pkg server.js --target node18-macos-x64 --output dist/tokio-bridge-mac-x64",
+    "build:win": "pkg server.js --target node18-win-x64 --output dist/tokio-bridge-win.exe",
+    "build:all": "npm run build:mac && npm run build:mac-x64 && npm run build:win",
+    "install:mac": "bash scripts/install-mac.sh",
+    "install:pm2": "pm2 start server.js --name tokio-bridge && pm2 save && pm2 startup"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "targets": ["node18-macos-arm64", "node18-macos-x64", "node18-win-x64"]
   }
 }
